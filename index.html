@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0d1117"/>
+  <meta name="description" content="নামাজের সময়সূচী, কিবলা ও তসবিহ"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>নামাজের সময় 🕌</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+    <h1 class="app-title">নামাজের সময়</h1>
+    <p class="location-label">📍 <span id="locationName">লোকেশন লোড হচ্ছে...</span></p>
+  </header>
+
+  <!-- ── Clock Card ── -->
+  <section class="clock-card">
+    <div class="clock" id="clock">০০:০০:০০</div>
+    <div class="date" id="dateDisplay"></div>
+
+    <div class="next-prayer" id="nextPrayerBox">
+      <span class="next-icon" id="nextIcon">🕌</span>
+      <span id="nextPrayerText">লোড হচ্ছে...</span>
+    </div>
+
+    <button class="azan-test-btn" onclick="testAzan()">🔊 আজান পরীক্ষা করুন</button>
+    <div class="error-msg" id="errorMsg" style="display:none"></div>
+  </section>
+
+  <!-- ── Tabs ── -->
+  <nav class="tabs">
+    <button class="tab-btn active" id="tabPrayer"  onclick="switchTab('prayer')">🕌 নামাজ</button>
+    <button class="tab-btn"        id="tabSpecial" onclick="switchTab('special')">🌙 বিশেষ</button>
+    <button class="tab-btn"        id="tabQibla"   onclick="switchTab('qibla')">🧭 কিবলা</button>
+    <button class="tab-btn"        id="tabTasbih"  onclick="switchTab('tasbih')">📿 তসবিহ</button>
+  </nav>
+
+  <!-- ══ PANEL: Prayer Times ══ -->
+  <section class="panel" id="panelPrayer">
+    <div class="prayer-list" id="prayerList">
+      <div class="loading">⏳ সময় গণনা হচ্ছে...</div>
+    </div>
+  </section>
+
+  <!-- ══ PANEL: Special (Jumma + Iftar/Sehri) ══ -->
+  <section class="panel hidden" id="panelSpecial">
+
+    <!-- Jumma -->
+    <div class="special-card">
+      <div class="special-card-header">
+        <span class="special-icon">🕌</span>
+        <div>
+          <div class="special-title">জুম'আর নামাজ</div>
+          <div class="special-sub">প্রতি শুক্রবার</div>
+        </div>
+      </div>
+      <div class="special-body" id="jummaInfo">
+        <div class="special-row">
+          <span>জুম'আর খুতবা শুরু</span>
+          <span class="special-time" id="jummaKhutba">—</span>
+        </div>
+        <div class="special-row">
+          <span>জুম'আর নামাজ</span>
+          <span class="special-time" id="jummaTime">—</span>
+        </div>
+        <div class="special-row">
+          <span>আজকের দিন</span>
+          <span class="special-time" id="todayDay">—</span>
+        </div>
+        <div class="jumma-note" id="jummaNote"></div>
+      </div>
+    </div>
+
+    <!-- Ramadan / Iftar & Sehri -->
+    <div class="special-card" style="margin-top:14px">
+      <div class="special-card-header">
+        <span class="special-icon">🌙</span>
+        <div>
+          <div class="special-title">ইফতার ও সাহরী</div>
+          <div class="special-sub">রমজান মাসের সময়সূচী</div>
+        </div>
+      </div>
+      <div class="special-body">
+        <div class="special-row highlight-row">
+          <div class="highlight-item">
+            <div class="highlight-label">🌅 সাহরীর শেষ সময়</div>
+            <div class="highlight-time" id="sehriTime">—</div>
+            <div class="highlight-sub">ফজরের ১০ মিনিট আগে</div>
+          </div>
+          <div class="divider-v"></div>
+          <div class="highlight-item">
+            <div class="highlight-label">🌇 ইফতারের সময়</div>
+            <div class="highlight-time" id="iftarTime">—</div>
+            <div class="highlight-sub">মাগরিবের সাথে</div>
+          </div>
+        </div>
+        <div class="iftar-countdown" id="iftarCountdown"></div>
+        <div class="iftar-dua">
+          اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ
+          <div style="font-size:12px;margin-top:4px;color:#c9a84c88">ইফতারের দোয়া</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══ PANEL: Qibla ══ -->
+  <section class="panel hidden" id="panelQibla">
+    <div class="qibla-card">
+      <p class="qibla-subtitle">মক্কা মুকাররমা — সোনালি তীর কিবলার দিক</p>
+      <div class="compass-wrap">
+        <svg class="compass-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c9a84c"/>
+              <stop offset="100%" stop-color="#8b6914"/>
+            </linearGradient>
+          </defs>
+          <circle cx="110" cy="110" r="106" fill="none" stroke="url(#ringGrad)" stroke-width="2.5"/>
+          <circle cx="110" cy="110" r="98" fill="rgba(0,0,0,0.35)"/>
+          <text x="110" y="28"  text-anchor="middle" fill="#c9a84c" font-size="13" font-weight="bold">উ</text>
+          <text x="192" y="115" text-anchor="middle" fill="#667788" font-size="13">পূ</text>
+          <text x="110" y="200" text-anchor="middle" fill="#667788" font-size="13">দ</text>
+          <text x="28"  y="115" text-anchor="middle" fill="#667788" font-size="13">প</text>
+          <g id="ticks"></g>
+        </svg>
+        <div class="needle-wrap" id="needleWrap">
+          <svg class="needle-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="needleGold" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#f0d060"/>
+                <stop offset="100%" stop-color="#c9a84c"/>
+              </linearGradient>
+            </defs>
+            <polygon points="110,18 116,110 110,106 104,110" fill="url(#needleGold)"/>
+            <polygon points="110,202 116,110 110,114 104,110" fill="rgba(50,50,50,0.6)"/>
+            <circle cx="110" cy="110" r="8" fill="#c9a84c"/>
+            <circle cx="110" cy="110" r="4" fill="#1a0a00"/>
+            <text x="110" y="36" text-anchor="middle" font-size="16">🕋</text>
+          </svg>
+        </div>
+      </div>
+      <div class="qibla-degree" id="qiblaDegree">— °</div>
+      <div class="coords" id="coordsDisplay"></div>
+      <p class="qibla-tip">ফোন সমতল রেখে সোনালি তীরের দিকে মুখ করুন</p>
+      <div class="arabic-text">اللَّهُ أَكْبَرُ</div>
+    </div>
+  </section>
+
+  <!-- ══ PANEL: Tasbih ══ -->
+  <section class="panel hidden" id="panelTasbih">
+    <div class="tasbih-card">
+
+      <!-- Zikr selector -->
+      <div class="zikr-selector">
+        <button class="zikr-btn active" onclick="setZikr(this,'سُبْحَانَ اللَّهِ','সুবহানআল্লাহ',33)">সুবহানআল্লাহ</button>
+        <button class="zikr-btn" onclick="setZikr(this,'اَلْحَمْدُ لِلَّهِ','আলহামদুলিল্লাহ',33)">আলহামদুলিল্লাহ</button>
+        <button class="zikr-btn" onclick="setZikr(this,'اللَّهُ أَكْبَرُ','আল্লাহু আকবার',34)">আল্লাহু আকবার</button>
+        <button class="zikr-btn" onclick="setZikr(this,'لَا إِلَٰهَ إِلَّا اللَّهُ','লা ইলাহা ইল্লাল্লাহ',100)">লা ইলাহা ইল্লাল্লাহ</button>
+      </div>
+
+      <!-- Arabic text -->
+      <div class="zikr-arabic" id="zikrArabic">سُبْحَانَ اللَّهِ</div>
+      <div class="zikr-bangla" id="zikrBangla">সুবহানআল্লাহ</div>
+
+      <!-- Counter display -->
+      <div class="tasbih-counter-wrap">
+        <div class="tasbih-count" id="tasbihCount">০</div>
+        <div class="tasbih-target" id="tasbihTarget">লক্ষ্য: ৩৩</div>
+      </div>
+
+      <!-- Progress ring -->
+      <div class="progress-wrap">
+        <svg class="progress-svg" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="6"/>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#c9a84c" stroke-width="6"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7"
+            stroke-linecap="round" transform="rotate(-90 60 60)"
+            id="progressRing"/>
+        </svg>
+      </div>
+
+      <!-- Main Tasbih Button -->
+      <div class="tasbih-btn-wrap">
+        <button class="tasbih-btn" id="tasbihBtn" onclick="tapTasbih()">
+          <!-- Outer decorative ring -->
+          <svg class="tasbih-deco" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f0d060"/>
+                <stop offset="50%" stop-color="#c9a84c"/>
+                <stop offset="100%" stop-color="#8b6914"/>
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- Outer decorative border -->
+            <circle cx="100" cy="100" r="95" fill="none" stroke="url(#btnGrad)" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+            <circle cx="100" cy="100" r="88" fill="none" stroke="url(#btnGrad)" stroke-width="0.8" opacity="0.3"/>
+            <!-- Islamic star pattern -->
+            <g transform="translate(100,100)" opacity="0.5" filter="url(#glow)">
+              <!-- 8-pointed star -->
+              <polygon points="0,-78 9,-9 78,0 9,9 0,78 -9,9 -78,0 -9,-9" fill="none" stroke="#c9a84c" stroke-width="0.8"/>
+              <polygon points="0,-78 9,-9 78,0 9,9 0,78 -9,9 -78,0 -9,-9" fill="none" stroke="#c9a84c" stroke-width="0.8" transform="rotate(22.5)"/>
+              <!-- Inner circle ornament -->
+              <circle r="68" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+              <!-- Corner dots -->
+              <circle cy="-75" r="2.5" fill="#c9a84c"/>
+              <circle cx="75"  r="2.5" fill="#c9a84c"/>
+              <circle cy="75"  r="2.5" fill="#c9a84c"/>
+              <circle cx="-75" r="2.5" fill="#c9a84c"/>
+              <circle cx="53"  cy="-53" r="1.5" fill="#c9a84c" opacity="0.6"/>
+              <circle cx="53"  cy="53"  r="1.5" fill="#c9a84c" opacity="0.6"/>
+              <circle cx="-53" cy="53"  r="1.5" fill="#c9a84c" opacity="0.6"/>
+              <circle cx="-53" cy="-53" r="1.5" fill="#c9a84c" opacity="0.6"/>
+            </g>
+            <!-- Main button fill -->
+            <circle cx="100" cy="100" r="64" fill="rgba(201,168,76,0.08)"/>
+          </svg>
+          <span class="tasbih-btn-inner">
+            <span class="tasbih-btn-icon">📿</span>
+            <span class="tasbih-btn-label">তসবিহ</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Controls -->
+      <div class="tasbih-controls">
+        <button class="ctrl-btn" onclick="undoTasbih()">↩ পূর্বাবস্থা</button>
+        <button class="ctrl-btn danger" onclick="resetTasbih()">🔄 রিসেট</button>
+      </div>
+
+      <!-- Session info -->
+      <div class="tasbih-session">
+        <div class="session-item">
+          <div class="session-num" id="sessionRounds">০</div>
+          <div class="session-label">রাউন্ড</div>
+        </div>
+        <div class="session-item">
+          <div class="session-num" id="sessionTotal">০</div>
+          <div class="session-label">মোট</div>
+        </div>
+      </div>
+
+      <div class="tasbih-complete" id="tasbihComplete" style="display:none">
+        ✅ মাশাআল্লাহ! এক রাউন্ড সম্পন্ন
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">নামাজের সময় আপনার অবস্থান অনুযায়ী গণনা করা হয়েছে</footer>
+
+  <script src="js/prayer.js"></script>
+  <script src="js/qibla.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
