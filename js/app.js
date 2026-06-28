@@ -71,11 +71,14 @@ function unlockAudioOnInteraction() {
   document.removeEventListener('click',      unlockAudioOnInteraction);
 }
 
-// আজান পরীক্ষা বাটন
 function testAzan() {
+  // প্রথমে unlock করুন
   AzanPlayer.unlock();
-  // ছোট delay দিয়ে play — unlock হওয়ার পর
-  setTimeout(() => AzanPlayer.play('Dhuhr'), 200);
+  
+  // ৫০০ms পরে play করুন — browser unlock হওয়ার সময় দিন
+  setTimeout(() => {
+    AzanPlayer.play('Dhuhr');
+  }, 500);
 }
 
 // ── Init ─────────────────────────────────────────────
