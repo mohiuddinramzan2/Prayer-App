@@ -1,0 +1,26 @@
+{
+  "name": "prayer-app",
+  "version": "1.0.0",
+  "description": "- 📍 GPS ভিত্তিক সঠিক নামাজের সময় - 🔊 **আজান** — ফজরে বিশেষ আজান, বাকি ওয়াক্তে সাধারণ আজান - 🕌 **জুম'আর সময়সূচী** — খুতবা ও নামাজের সময় - 🌙 **ইফতার ও সাহরীর সময়** — কাউন্টডাউন সহ - 🧭 **কিবলা কম্পাস** — ডিভাইস সেন্সর ব্যবহার করে - 📿 **ডিজিটাল তসবিহ** — সুবহানআল্লাহ, আলহামদুলিল্লাহ ও আরো - 📱 PWA — ফোনে ইনস্টল করা যাবে",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohiuddinramzan2/Prayer-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mohiuddinramzan2/Prayer-App/issues"
+  },
+  "homepage": "https://github.com/mohiuddinramzan2/Prayer-App#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1"
+  }
+}

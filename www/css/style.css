@@ -1,0 +1,288 @@
+/* ── Reset & Variables ───────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:      #c9a84c;
+  --gold-lt:   #f0d060;
+  --gold-dim:  rgba(201,168,76,0.16);
+  --bg:        #0d1117;
+  --bg2:       #0f1d2e;
+  --surface:   rgba(255,255,255,0.04);
+  --border:    rgba(201,168,76,0.18);
+  --text:      #e8dcc8;
+  --muted:     #8899aa;
+  --radius:    16px;
+}
+
+body {
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 4px; }
+
+/* ── Animations ─────────────────────────────────────── */
+@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.35} }
+@keyframes glow     { 0%,100%{box-shadow:0 0 18px rgba(201,168,76,.2)} 50%{box-shadow:0 0 36px rgba(201,168,76,.45)} }
+@keyframes slideUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes tapPulse { 0%{transform:scale(1)} 40%{transform:scale(0.93)} 100%{transform:scale(1)} }
+@keyframes complete { 0%{opacity:0;transform:scale(.8)} 100%{opacity:1;transform:scale(1)} }
+@keyframes ripple   { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(2.2);opacity:0} }
+
+/* ── Header ─────────────────────────────────────────── */
+.header {
+  width:100%; max-width:480px;
+  text-align:center; padding:28px 20px 14px;
+  animation: slideUp .5s ease;
+}
+.bismillah { font-size:14px; color:var(--gold); letter-spacing:2px; opacity:.85; margin-bottom:8px; }
+.app-title  { font-size:28px; font-weight:700; color:#f0e6c8; }
+.location-label { font-size:12px; color:var(--muted); margin-top:5px; }
+
+/* ── Clock Card ─────────────────────────────────────── */
+.clock-card {
+  width:90%; max-width:460px;
+  background:linear-gradient(135deg,var(--gold-dim),rgba(201,168,76,.04));
+  border:1px solid var(--border); border-radius:20px;
+  padding:22px 20px 18px; text-align:center;
+  margin-bottom:18px; animation:glow 3s infinite;
+}
+.clock { font-size:48px; font-weight:700; color:#f0e6c8; letter-spacing:3px; font-variant-numeric:tabular-nums; }
+.date  { font-size:13px; color:var(--gold); margin-top:6px; opacity:.9; }
+
+.next-prayer {
+  margin-top:14px; padding:10px 16px;
+  background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.22);
+  border-radius:12px; display:flex; align-items:center; justify-content:center;
+  gap:8px; font-size:13px; color:var(--gold);
+}
+.next-icon { animation:pulse 2s infinite; font-size:16px; }
+
+.azan-test-btn {
+  margin-top:12px; padding:7px 18px;
+  background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.3);
+  color:var(--gold); border-radius:10px; cursor:pointer;
+  font-size:13px; font-family:inherit; transition:all .2s;
+}
+.azan-test-btn:hover { background:rgba(201,168,76,.22); }
+
+.error-msg {
+  margin-top:10px; font-size:12px; color:rgba(201,168,76,.6);
+  background:rgba(201,168,76,.06); padding:6px 10px; border-radius:8px;
+}
+
+/* ── Tabs ───────────────────────────────────────────── */
+.tabs {
+  display:flex; gap:6px; flex-wrap:wrap; justify-content:center;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:16px; padding:5px; margin-bottom:18px;
+}
+.tab-btn {
+  padding:9px 18px; border-radius:12px; border:none; cursor:pointer;
+  font-family:inherit; font-size:13px; font-weight:600;
+  background:transparent; color:var(--muted); transition:all .2s;
+}
+.tab-btn.active { background:linear-gradient(135deg,var(--gold),#8b6914); color:#0d1117; }
+
+/* ── Panels ─────────────────────────────────────────── */
+.panel { width:90%; max-width:460px; animation:slideUp .3s ease; }
+.hidden { display:none !important; }
+.loading { text-align:center; color:var(--muted); padding:40px; }
+
+/* ── Prayer List ────────────────────────────────────── */
+.prayer-list { display:flex; flex-direction:column; gap:10px; }
+.prayer-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-radius:var(--radius);
+  background:var(--surface); border:1px solid rgba(255,255,255,.06);
+}
+.prayer-item.active-prayer {
+  background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.07));
+  border-color:rgba(201,168,76,.4);
+}
+.prayer-left { display:flex; align-items:center; gap:12px; }
+.prayer-icon-box {
+  width:44px; height:44px; border-radius:12px;
+  background:rgba(255,255,255,.05);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.prayer-item.active-prayer .prayer-icon-box { background:rgba(201,168,76,.18); }
+.prayer-name  { font-weight:600; font-size:15px; color:#c8bfa8; }
+.prayer-item.active-prayer .prayer-name { color:#f0e6c8; }
+.prayer-sub   { font-size:11px; color:var(--muted); margin-top:1px; }
+.prayer-time  { font-size:20px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+.prayer-item.active-prayer .prayer-time { color:var(--gold); }
+
+/* ── Special Cards ──────────────────────────────────── */
+.special-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; overflow:hidden;
+}
+.special-card-header {
+  display:flex; align-items:center; gap:14px;
+  padding:16px 18px;
+  background:rgba(201,168,76,.08); border-bottom:1px solid var(--border);
+}
+.special-icon  { font-size:28px; }
+.special-title { font-size:16px; font-weight:700; color:#f0e6c8; }
+.special-sub   { font-size:12px; color:var(--muted); margin-top:2px; }
+.special-body  { padding:16px 18px; display:flex; flex-direction:column; gap:10px; }
+
+.special-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 14px; background:rgba(255,255,255,.03);
+  border-radius:10px; border:1px solid rgba(255,255,255,.05);
+  font-size:14px; color:#c8bfa8;
+}
+.special-time { font-weight:700; font-size:16px; color:var(--gold); font-variant-numeric:tabular-nums; }
+
+.jumma-note {
+  font-size:13px; color:var(--gold); text-align:center;
+  padding:8px; background:rgba(201,168,76,.08);
+  border-radius:8px; border:1px solid rgba(201,168,76,.2);
+  animation:pulse 2s infinite;
+}
+
+/* Iftar highlight row */
+.highlight-row {
+  display:flex !important; flex-direction:row !important;
+  gap:0; padding:0 !important; background:transparent !important;
+  border:none !important;
+}
+.highlight-item {
+  flex:1; text-align:center; padding:14px 10px;
+  background:rgba(201,168,76,.06); border-radius:12px;
+}
+.highlight-item:first-child { margin-right:8px; }
+.highlight-label { font-size:12px; color:var(--muted); margin-bottom:6px; }
+.highlight-time  { font-size:24px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+.highlight-sub   { font-size:11px; color:var(--muted); margin-top:4px; }
+.divider-v       { display:none; }
+
+.iftar-countdown {
+  text-align:center; font-size:13px; color:var(--gold);
+  padding:8px; background:rgba(201,168,76,.08);
+  border-radius:8px; border:1px solid rgba(201,168,76,.15);
+  min-height:36px; display:flex; align-items:center; justify-content:center;
+}
+.iftar-dua {
+  text-align:center; font-size:16px; color:var(--gold);
+  padding:12px; background:rgba(201,168,76,.05);
+  border-radius:10px; border:1px solid rgba(201,168,76,.15);
+  line-height:1.8; letter-spacing:1px;
+}
+
+/* ── Qibla ──────────────────────────────────────────── */
+.qibla-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:28px 20px; text-align:center;
+}
+.qibla-subtitle { font-size:13px; color:var(--gold); opacity:.85; margin-bottom:4px; }
+.compass-wrap   { position:relative; width:220px; height:220px; margin:24px auto 10px; }
+.compass-svg, .needle-svg { width:220px; height:220px; }
+.compass-svg    { position:absolute; top:0; left:0; }
+.needle-wrap    { position:absolute; top:0; left:0; width:100%; height:100%; transition:transform .5s cubic-bezier(.34,1.56,.64,1); }
+.qibla-degree   { margin-top:12px; color:var(--gold); font-size:13px; font-weight:600; background:rgba(201,168,76,.1); display:inline-block; padding:3px 14px; border-radius:20px; border:1px solid rgba(201,168,76,.25); }
+.coords         { margin-top:10px; font-size:12px; color:var(--muted); }
+.qibla-tip      { margin-top:14px; font-size:13px; color:var(--muted); line-height:1.6; }
+.arabic-text    { margin-top:18px; font-size:18px; color:var(--gold); letter-spacing:2px; padding:10px; background:rgba(201,168,76,.06); border:1px solid var(--border); border-radius:10px; }
+
+/* ── Tasbih ─────────────────────────────────────────── */
+.tasbih-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:22px 16px 24px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+
+.zikr-selector {
+  display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:100%;
+}
+.zikr-btn {
+  padding:7px 13px; border-radius:20px; border:1px solid rgba(201,168,76,.25);
+  background:rgba(201,168,76,.07); color:var(--muted);
+  font-size:12px; font-family:inherit; cursor:pointer; transition:all .2s;
+}
+.zikr-btn.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); font-weight:600; }
+
+.zikr-arabic { font-size:22px; color:var(--gold); letter-spacing:2px; text-align:center; line-height:1.6; }
+.zikr-bangla { font-size:13px; color:var(--muted); text-align:center; }
+
+.tasbih-counter-wrap { text-align:center; }
+.tasbih-count  { font-size:64px; font-weight:700; color:#f0e6c8; font-variant-numeric:tabular-nums; line-height:1; transition:all .15s; }
+.tasbih-target { font-size:12px; color:var(--muted); margin-top:4px; }
+
+/* Progress ring */
+.progress-wrap { position:relative; width:120px; height:120px; margin:-10px auto -10px; }
+.progress-svg  { width:120px; height:120px; }
+#progressRing  { transition: stroke-dashoffset .3s ease; }
+
+/* Main Tasbih Button */
+.tasbih-btn-wrap { position:relative; }
+.tasbih-btn {
+  width:200px; height:200px; border-radius:50%;
+  border:none; cursor:pointer;
+  background:radial-gradient(circle at 35% 35%, rgba(201,168,76,.18), rgba(201,168,76,.04));
+  position:relative; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s, box-shadow .15s;
+  box-shadow: 0 0 30px rgba(201,168,76,.15), 0 0 60px rgba(201,168,76,.06);
+}
+.tasbih-btn:active { animation:tapPulse .25s ease; box-shadow:0 0 50px rgba(201,168,76,.35); }
+
+.tasbih-deco {
+  position:absolute; top:0; left:0;
+  width:200px; height:200px;
+  animation:none;
+}
+
+.tasbih-btn-inner {
+  position:relative; z-index:2;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.tasbih-btn-icon  { font-size:36px; }
+.tasbih-btn-label { font-size:14px; color:var(--gold); font-weight:600; letter-spacing:1px; }
+
+/* Controls */
+.tasbih-controls { display:flex; gap:10px; }
+.ctrl-btn {
+  padding:9px 18px; border-radius:12px; border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04); color:var(--muted);
+  font-size:13px; font-family:inherit; cursor:pointer; transition:all .2s;
+}
+.ctrl-btn:hover { background:rgba(255,255,255,.08); color:var(--text); }
+.ctrl-btn.danger:hover { background:rgba(220,50,50,.12); border-color:rgba(220,50,50,.3); color:#ff8080; }
+
+/* Session */
+.tasbih-session {
+  display:flex; gap:24px; justify-content:center;
+  padding:12px 20px; background:rgba(201,168,76,.06);
+  border:1px solid rgba(201,168,76,.15); border-radius:12px; width:100%;
+}
+.session-item { text-align:center; }
+.session-num  { font-size:22px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+.session-label{ font-size:11px; color:var(--muted); margin-top:2px; }
+
+.tasbih-complete {
+  font-size:14px; color:#4ade80; font-weight:600;
+  padding:10px 18px; background:rgba(74,222,128,.1);
+  border:1px solid rgba(74,222,128,.25); border-radius:10px;
+  animation:complete .4s ease;
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+.footer { margin-top:28px; font-size:11px; color:rgba(51,68,85,.9); text-align:center; }
+
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width:380px) {
+  .clock { font-size:38px; }
+  .tab-btn { padding:8px 12px; font-size:12px; }
+  .tasbih-btn { width:170px; height:170px; }
+  .tasbih-deco { width:170px; height:170px; }
+  .tasbih-count { font-size:52px; }
+}
