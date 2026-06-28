@@ -3,47 +3,138 @@
 const QiblaCalc = (() => {
   const toRad = d => d * Math.PI / 180;
   const toDeg = r => r * 180 / Math.PI;
-  const KAABA = { lat: 21.4225, lng: 39.8262 };
 
-  function getDirection(lat, lng) {
-    const mLat = toRad(KAABA.lat), mLng = toRad(KAABA.lng);
-    const uLat = toRad(lat),       uLng = toRad(lng);
-    const y = Math.sin(mLng - uLng) * Math.cos(mLat);
-    const x = Math.cos(uLat)*Math.sin(mLat) - Math.sin(uLat)*Math.cos(mLat)*Math.cos(mLng-uLng);
-    return ((toDeg(Math.atan2(y, x)) % 360) + 360) % 360;
+  const KAABA = {
+    lat: 21.4225,
+    lng: 39.8262
+  };
+
+  function normalize(angle) {
+    return ((angle % 360) + 360) % 360;
   }
 
-  return { getDirection };
+  function getDirection(lat, lng) {
+    const mLat = toRad(KAABA.lat);
+    const mLng = toRad(KAABA.lng);
+
+    const uLat = toRad(lat);
+    const uLng = toRad(lng);
+
+    const y = Math.sin(mLng - uLng) * Math.cos(mLat);
+
+    const x =
+      Math.cos(uLat) * Math.sin(mLat) -
+      Math.sin(uLat) *
+      Math.cos(mLat) *
+      Math.cos(mLng - uLng);
+
+    return normalize(toDeg(Math.atan2(y, x)));
+  }
+
+  return {
+    getDirection
+  };
 })();
 
 
 // ── Device Compass ────────────────────────────────────
 
 const Compass = (() => {
-  let _heading  = 0;
-  let _callback = null;
 
-  function _handler(e) {
-    _heading = e.alpha || 0;
-    if (_callback) _callback(_heading);
+  let heading = 0;
+  let callback = null;
+
+  function normalize(angle) {
+    return ((angle % 360) + 360) % 360;
   }
 
-  function start(cb) {
-    _callback = cb;
+  function handleOrientation(event) {
 
-    if (typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+
-      DeviceOrientationEvent.requestPermission()
-        .then(s => { if (s === 'granted') window.addEventListener('deviceorientation', _handler, true); })
-        .catch(console.warn);
-    } else if ('ondeviceorientationabsolute' in window) {
-      window.addEventListener('deviceorientationabsolute', _handler, true);
-    } else {
-      window.addEventListener('deviceorientation', _handler, true);
+    let newHeading = null;
+
+    // iPhone Safari
+    if (typeof event.webkitCompassHeading === "number") {
+
+      newHeading = event.webkitCompassHeading;
+
+    }
+    // Android Absolute Compass
+    else if (event.absolute === true && event.alpha != null) {
+
+      newHeading = 360 - event.alpha;
+
+    }
+    // Android Fallback
+    else if (event.alpha != null) {
+
+      newHeading = 360 - event.alpha;
+    }
+
+    if (newHeading == null) return;
+
+    heading = normalize(newHeading);
+
+    if (callback) {
+      callback(heading);
     }
   }
 
-  function getHeading() { return _heading; }
-  return { start, getHeading };
+  function start(cb) {
+
+    callback = cb;
+
+    if (
+      typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function"
+    ) {
+
+      DeviceOrientationEvent.requestPermission()
+        .then(permission => {
+
+          if (permission === "granted") {
+
+            window.addEventListener(
+              "deviceorientation",
+              handleOrientation,
+              true
+            );
+
+          }
+
+        })
+        .catch(console.error);
+
+    } else {
+
+      if ("ondeviceorientationabsolute" in window) {
+
+        window.addEventListener(
+          "deviceorientationabsolute",
+          handleOrientation,
+          true
+        );
+
+      } else {
+
+        window.addEventListener(
+          "deviceorientation",
+          handleOrientation,
+          true
+        );
+
+      }
+
+    }
+
+  }
+
+  function getHeading() {
+    return heading;
+  }
+
+  return {
+    start,
+    getHeading
+  };
+
 })();
