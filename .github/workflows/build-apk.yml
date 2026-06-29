@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -25,6 +25,23 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Sync www folder
+        run: |
+          mkdir -p www/js www/css www/assets
+          cp index.html www/
+          cp manifest.json www/
+          cp favicon.ico www/ 2>/dev/null || true
+          cp css/style.css www/css/
+          cp js/prayer.js www/js/
+          cp js/qibla.js www/js/
+          cp js/settings.js www/js/
+          cp js/notification.js www/js/
+          cp js/app.js www/js/
+          cp assets/azan_fajr.mp3 www/assets/ 2>/dev/null || true
+          cp assets/azan_normal.mp3 www/assets/ 2>/dev/null || true
+          cp assets/icon-192.png www/assets/ 2>/dev/null || true
+          cp assets/icon-512.png www/assets/ 2>/dev/null || true
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -40,14 +57,14 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: PrayerApp-v2
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: APK Build ${{ github.run_number }}
+          tag_name: v2-build-${{ github.run_number }}
+          name: Prayer App v2 - Build ${{ github.run_number }}
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

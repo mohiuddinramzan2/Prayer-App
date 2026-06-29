@@ -1,5 +1,4 @@
 // ── Prayer Time Calculator ────────────────────────────
-
 const PrayerCalc = (() => {
   const toRad = d => d * Math.PI / 180;
   const toDeg = r => r * 180 / Math.PI;
@@ -44,7 +43,6 @@ const PrayerCalc = (() => {
     return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
   }
 
-  // Subtract minutes from a time string "HH:MM"
   function subtractMinutes(timeStr, mins) {
     if (!timeStr || timeStr === "--:--") return "--:--";
     const [h, m] = timeStr.split(":").map(Number);
@@ -58,13 +56,11 @@ const PrayerCalc = (() => {
     const tz  = -date.getTimezoneOffset() / 60;
     const { dec, eqT } = sunPosition(date);
     const noon = 12 - lng/15 - eqT/60 + tz;
-
     const fajrH  = hourAngle(lat, dec, 18);
     const sunrH  = hourAngle(lat, dec, 0.833);
     const asrH   = asrAngle(lat, dec);
     const maghH  = hourAngle(lat, dec, 0.833);
     const ishaH  = hourAngle(lat, dec, 17);
-
     const raw = {
       Fajr:    fajrH  !== null ? noon - fajrH  : null,
       Dhuhr:   noon,
@@ -72,10 +68,8 @@ const PrayerCalc = (() => {
       Maghrib: maghH  !== null ? noon + maghH  : null,
       Isha:    ishaH  !== null ? noon + ishaH  : null,
     };
-
-    const fajrStr   = toStr(raw.Fajr);
-    const maghribStr= toStr(raw.Maghrib);
-
+    const fajrStr    = toStr(raw.Fajr);
+    const maghribStr = toStr(raw.Maghrib);
     return {
       times: {
         Fajr:    fajrStr,
@@ -86,10 +80,8 @@ const PrayerCalc = (() => {
         Isha:    toStr(raw.Isha),
       },
       raw,
-      // Sehri = Fajr - 10 min (safe margin)
-      sehri:  subtractMinutes(fajrStr, 10),
-      // Iftar = Maghrib
-      iftar:  maghribStr,
+      sehri: subtractMinutes(fajrStr, 10),
+      iftar: maghribStr,
     };
   }
 
@@ -112,7 +104,6 @@ const PrayerCalc = (() => {
     return h > 0 ? `${h} ঘণ্টা ${m} মিনিট পরে` : `${m} মিনিট পরে`;
   }
 
-  // Time until iftar (returns string or null)
   function iftarCountdown(iftarStr) {
     if (!iftarStr || iftarStr === "--:--") return null;
     const [ih, im] = iftarStr.split(":").map(Number);
@@ -120,9 +111,8 @@ const PrayerCalc = (() => {
     const cur  = now.getHours()*60 + now.getMinutes();
     const ifm  = ih*60 + im;
     let diff   = ifm - cur;
-    if (diff < 0) return null; // already passed
-    const h = Math.floor(diff/60);
-    const m = diff % 60;
+    if (diff < 0) return null;
+    const h = Math.floor(diff/60), m = diff % 60;
     if (h > 0) return `ইফতার পর্যন্ত: ${h} ঘণ্টা ${m} মিনিট বাকি`;
     if (m > 0) return `ইফতার পর্যন্ত: ${m} মিনিট বাকি`;
     return "🌙 ইফতারের সময় হয়েছে!";
