@@ -24,7 +24,12 @@ const Compass = (() => {
   let _callback = null;
 
   function _handler(e) {
-    _heading = e.alpha || 0;
+    let heading=null;
+    if (typeof e.webkitCompassHeading==="number") heading=e.webkitCompassHeading;
+    else if (e.absolute===true && e.alpha!=null) heading=360-e.alpha;
+    else if (e.alpha!=null) heading=360-e.alpha;
+    if(heading==null) return;
+    _heading=((heading%360)+360)%360;
     if (_callback) _callback(_heading);
   }
 

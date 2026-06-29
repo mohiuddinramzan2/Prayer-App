@@ -220,7 +220,7 @@ function updateIftarCountdown() {
 
 // ── Qibla ─────────────────────────────────────────────
 function updateQiblaInfo() {
-  if (!state.qibla) return;
+  if (state.qibla === null) return;
   document.getElementById('qiblaDegree').textContent =
     `${Math.round(state.qibla)}° কিবলা`;
   document.getElementById('coordsDisplay').textContent =
@@ -231,7 +231,7 @@ function updateQiblaInfo() {
 function updateNeedle() {
   if (state.qibla === null) return;
   document.getElementById('needleWrap').style.transform =
-    `rotate(${state.qibla - state.deviceHeading}deg)`;
+    `rotate(${((state.qibla - state.deviceHeading + 540) % 360) - 180}deg)`;
 }
 
 function drawTicks() {
